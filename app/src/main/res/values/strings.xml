@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Quick Toggles</string>
+    <string name="wifi_on">WiFi On</string>
+    <string name="wifi_off">WiFi Off</string>
+    <string name="bluetooth_off">Bluetooth Off</string>
+    <string name="bluetooth_on">Bluetooth On</string>
+    <string name="gps_on">Gps On</string>
+    <string name="gps_off">Gps Off</string>
+    <string name="airplane_off">Airplane Mode Off</string>
+    <string name="airplane_on">Airplane Mode On</string>
+</resources>

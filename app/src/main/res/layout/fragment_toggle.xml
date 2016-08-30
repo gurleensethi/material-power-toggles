@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ToggleButton
+                android:id="@+id/wifi_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/wifi_off"
+                android:textOn="@string/wifi_on"/>
+
+            <ToggleButton
+                android:id="@+id/bluetooth_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/bluetooth_off"
+                android:textOn="@string/bluetooth_on"/>
+
+            <ToggleButton
+                android:id="@+id/gps_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/gps_off"
+                android:textOn="@string/gps_on"/>
+
+            <ToggleButton
+                android:id="@+id/airplane_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/airplane_off"
+                android:textOn="@string/airplane_on"/>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+</android.support.design.widget.CoordinatorLayout>
