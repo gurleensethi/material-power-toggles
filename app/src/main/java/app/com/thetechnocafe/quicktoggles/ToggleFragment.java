@@ -96,7 +96,24 @@ public class ToggleFragment extends Fragment {
     }
 
     private void setUpAirplaneModeToggle() {
-
+        int enabled = Settings.System.getInt(getContext().getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0);
+        mAirplaneModeToggle.setChecked(enabled == 1);
+        mAirplaneModeToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                int enabled = 0;
+                if(isChecked) {
+                    enabled = 1;
+                } else {
+                    enabled = 0;
+                }
+                Settings.System.putInt(getContext().getContentResolver(), Settings.System.AIRPLANE_MODE_ON, enabled);
+                //Broadcast mode change
+                Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+                intent.putExtra("state",enabled == 1);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
