@@ -6,17 +6,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
 import android.widget.ToggleButton;
+
+import java.lang.reflect.Method;
 
 /**
  * Created by gurleensethi on 20/08/16.
@@ -27,6 +32,9 @@ public class ToggleFragment extends Fragment {
     private ToggleButton mBluetoothToggle;
     private ToggleButton mGPSToggle;
     private ToggleButton mAirplaneModeToggle;
+    private ToggleButton mDataToggle;
+    private ToggleButton mHotspotToggle;
+    private SeekBar mVolumeSeekBar;
 
     public static ToggleFragment getInstance() {
         return new ToggleFragment();
@@ -46,6 +54,9 @@ public class ToggleFragment extends Fragment {
         mBluetoothToggle = (ToggleButton) view.findViewById(R.id.bluetooth_toggle_button);
         mGPSToggle = (ToggleButton) view.findViewById(R.id.gps_toggle_button);
         mAirplaneModeToggle = (ToggleButton) view.findViewById(R.id.airplane_toggle_button);
+        mDataToggle = (ToggleButton) view.findViewById(R.id.data_toggle_button);
+        mHotspotToggle = (ToggleButton) view.findViewById(R.id.hotspot_toggle_button);
+        mVolumeSeekBar = (SeekBar) view.findViewById(R.id.system_volume_seekbar);
 
         return view;
     }
@@ -98,20 +109,63 @@ public class ToggleFragment extends Fragment {
     private void setUpAirplaneModeToggle() {
         int enabled = Settings.System.getInt(getContext().getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0);
         mAirplaneModeToggle.setChecked(enabled == 1);
-        mAirplaneModeToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mAirplaneModeToggle.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int enabled = 0;
-                if(isChecked) {
-                    enabled = 1;
-                } else {
-                    enabled = 0;
-                }
-                Settings.System.putInt(getContext().getContentResolver(), Settings.System.AIRPLANE_MODE_ON, enabled);
-                //Broadcast mode change
-                Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-                intent.putExtra("state",enabled == 1);
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS);
                 startActivity(intent);
+            }
+        });
+    }
+
+    private void setUpDataToggle() {
+        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        try {
+            Method getMobileDataEnabledMethod = telephonyManager.getClass().getDeclaredMethod("getDataEnabled");
+            if(getMobileDataEnabledMethod != null) {
+                mDataToggle.setChecked((Boolean)getMobileDataEnabledMethod.invoke(telephonyManager));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mDataToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void setUpHotspotToggle() {
+        WifiManager wifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+        mHotspotToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void setUpVolumeSeekBar() {
+        final AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        mVolumeSeekBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
+        mVolumeSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_RING));
+        mVolumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_RING, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
     }
@@ -127,5 +181,8 @@ public class ToggleFragment extends Fragment {
         setUpBluetoothToggle();
         setUpGPSToggle();
         setUpAirplaneModeToggle();
+        setUpDataToggle();
+        setUpHotspotToggle();
+        setUpVolumeSeekBar();
     }
 }

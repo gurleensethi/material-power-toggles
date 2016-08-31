@@ -42,6 +42,25 @@
                 android:textOff="@string/airplane_off"
                 android:textOn="@string/airplane_on"/>
 
+            <ToggleButton
+                android:id="@+id/data_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/data_off"
+                android:textOn="@string/data_on"/>
+
+            <ToggleButton
+                android:id="@+id/hotspot_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/hotspot_off"
+                android:textOn="@string/hotspot_on"/>
+
+            <SeekBar
+                android:id="@+id/system_volume_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>

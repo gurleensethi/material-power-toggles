@@ -8,4 +8,8 @@
     <string name="gps_off">Gps Off</string>
     <string name="airplane_off">Airplane Mode Off</string>
     <string name="airplane_on">Airplane Mode On</string>
+    <string name="data_off">Data Off</string>
+    <string name="data_on">Data On</string>
+    <string name="hotspot_off">Hotspot Off</string>
+    <string name="hotspot_on">Hotspot On</string>
 </resources>
