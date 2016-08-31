@@ -18,8 +18,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.SeekBar;
 import android.widget.ToggleButton;
+
+import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 import java.lang.reflect.Method;
 
@@ -34,7 +35,9 @@ public class ToggleFragment extends Fragment {
     private ToggleButton mAirplaneModeToggle;
     private ToggleButton mDataToggle;
     private ToggleButton mHotspotToggle;
-    private SeekBar mVolumeSeekBar;
+    private DiscreteSeekBar mVolumeSeekBar;
+    private DiscreteSeekBar mMusicSeekBar;
+    private DiscreteSeekBar mAlarmSeekBar;
 
     public static ToggleFragment getInstance() {
         return new ToggleFragment();
@@ -56,7 +59,9 @@ public class ToggleFragment extends Fragment {
         mAirplaneModeToggle = (ToggleButton) view.findViewById(R.id.airplane_toggle_button);
         mDataToggle = (ToggleButton) view.findViewById(R.id.data_toggle_button);
         mHotspotToggle = (ToggleButton) view.findViewById(R.id.hotspot_toggle_button);
-        mVolumeSeekBar = (SeekBar) view.findViewById(R.id.system_volume_seekbar);
+        mVolumeSeekBar = (DiscreteSeekBar) view.findViewById(R.id.system_volume_seekbar);
+        mMusicSeekBar = (DiscreteSeekBar) view.findViewById(R.id.music_volume_seekbar);
+        mAlarmSeekBar = (DiscreteSeekBar) view.findViewById(R.id.alarm_volume_seekbar);
 
         return view;
     }
@@ -152,19 +157,63 @@ public class ToggleFragment extends Fragment {
         final AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
         mVolumeSeekBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
         mVolumeSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_RING));
-        mVolumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        mVolumeSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                audioManager.setStreamVolume(AudioManager.STREAM_RING, progress, 0);
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_RING, value, 0);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
 
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+        });
+    }
+
+    private void setUpMusicVolumeSeekBar() {
+        final AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        mMusicSeekBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        mMusicSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+        mMusicSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            @Override
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+        });
+    }
+
+    private void setUpAlarmVolumeSeekBar() {
+        final AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        mAlarmSeekBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM));
+        mAlarmSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_ALARM));
+        mAlarmSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            @Override
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, value, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
 
             }
         });
@@ -184,5 +233,7 @@ public class ToggleFragment extends Fragment {
         setUpDataToggle();
         setUpHotspotToggle();
         setUpVolumeSeekBar();
+        setUpMusicVolumeSeekBar();
+        setUpAlarmVolumeSeekBar();
     }
 }
