@@ -14,4 +14,5 @@
     <string name="hotspot_on">Hotspot On</string>
     <string name="orientation_on">Orientation On</string>
     <string name="orientation_off">Orientation Off</string>
+    <string name="screen_timeout">Screen Timeout</string>
 </resources>

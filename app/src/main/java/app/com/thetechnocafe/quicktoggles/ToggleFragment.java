@@ -19,7 +19,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
@@ -42,6 +44,7 @@ public class ToggleFragment extends Fragment {
     private DiscreteSeekBar mAlarmSeekBar;
     private DiscreteSeekBar mVoiceCallSeekBar;
     private ToggleButton mOrientationToggle;
+    private Button mScreenTimeOutButton;
 
     public static ToggleFragment getInstance() {
         return new ToggleFragment();
@@ -68,6 +71,7 @@ public class ToggleFragment extends Fragment {
         mAlarmSeekBar = (DiscreteSeekBar) view.findViewById(R.id.alarm_volume_seekbar);
         mVoiceCallSeekBar = (DiscreteSeekBar) view.findViewById(R.id.voice_call_volume_seekbar);
         mOrientationToggle = (ToggleButton) view.findViewById(R.id.orientation_toggle_button);
+        mScreenTimeOutButton = (Button) view.findViewById(R.id.screen_timeout_button);
 
         requestPermissions(new String[]{Manifest.permission.WRITE_SETTINGS}, 1);
 
@@ -268,6 +272,15 @@ public class ToggleFragment extends Fragment {
         });
     }
 
+    private void setUpScreenTimeOutButton() {
+        mScreenTimeOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTimeOut(15000);
+            }
+        });
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -286,6 +299,7 @@ public class ToggleFragment extends Fragment {
         setUpAlarmVolumeSeekBar();
         setUpVoiceCallVolumeSeekBar();
         setUpOrientationToggle();
+        setUpScreenTimeOutButton();
     }
 
     private void createCircularAnimation(View view) {
@@ -296,6 +310,20 @@ public class ToggleFragment extends Fragment {
         if (Build.VERSION.SDK_INT > 20) {
             animatior = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
             animatior.start();
+        }
+    }
+
+    private void setTimeOut(int timeOut) {
+        if (Settings.System.canWrite(getContext())) {
+            Settings.System.putInt(getContext().getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, timeOut);
+            try {
+                Toast.makeText(getContext(),""+Settings.System.getInt(getContext().getContentResolver(),Settings.System.SCREEN_OFF_TIMEOUT),Toast.LENGTH_SHORT).show();
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            startActivity(intent);
         }
     }
 }
