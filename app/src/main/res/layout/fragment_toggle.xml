@@ -16,10 +16,11 @@
 
             <ToggleButton
                 android:id="@+id/wifi_toggle_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textOff="@string/wifi_off"
-                android:textOn="@string/wifi_on"/>
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:textOff="@null"
+                android:textOn="@null"
+                android:background="@drawable/wifi_toggle"/>
 
             <ToggleButton
                 android:id="@+id/bluetooth_toggle_button"
@@ -70,6 +71,18 @@
                 android:id="@+id/alarm_volume_seekbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
+
+            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                android:id="@+id/voice_call_volume_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <ToggleButton
+                android:id="@+id/flashlight_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/flashlight_off"
+                android:textOn="@string/flashlight_on"/>
 
         </LinearLayout>
 

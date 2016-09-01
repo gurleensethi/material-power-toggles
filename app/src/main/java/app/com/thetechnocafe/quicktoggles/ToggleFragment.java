@@ -1,10 +1,12 @@
 package app.com.thetechnocafe.quicktoggles;
 
 import android.Manifest;
+import android.animation.Animator;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.net.wifi.WifiManager;
@@ -16,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
@@ -38,6 +41,8 @@ public class ToggleFragment extends Fragment {
     private DiscreteSeekBar mVolumeSeekBar;
     private DiscreteSeekBar mMusicSeekBar;
     private DiscreteSeekBar mAlarmSeekBar;
+    private DiscreteSeekBar mVoiceCallSeekBar;
+    private ToggleButton mFlashlightToggle;
 
     public static ToggleFragment getInstance() {
         return new ToggleFragment();
@@ -62,6 +67,8 @@ public class ToggleFragment extends Fragment {
         mVolumeSeekBar = (DiscreteSeekBar) view.findViewById(R.id.system_volume_seekbar);
         mMusicSeekBar = (DiscreteSeekBar) view.findViewById(R.id.music_volume_seekbar);
         mAlarmSeekBar = (DiscreteSeekBar) view.findViewById(R.id.alarm_volume_seekbar);
+        mVoiceCallSeekBar = (DiscreteSeekBar) view.findViewById(R.id.voice_call_volume_seekbar);
+        mFlashlightToggle = (ToggleButton) view.findViewById(R.id.flashlight_toggle_button);
 
         return view;
     }
@@ -73,6 +80,7 @@ public class ToggleFragment extends Fragment {
         mWifiToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                createCircularAnimation(mWifiToggle);
                 wifiManager.setWifiEnabled(isChecked);
             }
         });
@@ -127,8 +135,8 @@ public class ToggleFragment extends Fragment {
         TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
         try {
             Method getMobileDataEnabledMethod = telephonyManager.getClass().getDeclaredMethod("getDataEnabled");
-            if(getMobileDataEnabledMethod != null) {
-                mDataToggle.setChecked((Boolean)getMobileDataEnabledMethod.invoke(telephonyManager));
+            if (getMobileDataEnabledMethod != null) {
+                mDataToggle.setChecked((Boolean) getMobileDataEnabledMethod.invoke(telephonyManager));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,6 +227,37 @@ public class ToggleFragment extends Fragment {
         });
     }
 
+    private void setUpVoiceCallVolumeSeekBar() {
+        final AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        mVoiceCallSeekBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL));
+        mVoiceCallSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
+        mVoiceCallSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            @Override
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, value, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+        });
+    }
+
+    private void setUpFlashlightToggle() {
+        Camera camera = Camera.open();
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(parameters);
+
+        camera.startPreview();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -235,5 +274,18 @@ public class ToggleFragment extends Fragment {
         setUpVolumeSeekBar();
         setUpMusicVolumeSeekBar();
         setUpAlarmVolumeSeekBar();
+        setUpVoiceCallVolumeSeekBar();
+        //setUpFlashlightToggle();
+    }
+
+    private void createCircularAnimation(View view) {
+        int cx = view.getWidth() / 2;
+        int cy = view.getHeight() / 2;
+        float finalRadius = (float) Math.hypot(cx, cy);
+        Animator animatior = null;
+        if (Build.VERSION.SDK_INT > 20) {
+            animatior = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+            animatior.start();
+        }
     }
 }

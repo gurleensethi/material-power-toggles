@@ -12,4 +12,6 @@
     <string name="data_on">Data On</string>
     <string name="hotspot_off">Hotspot Off</string>
     <string name="hotspot_on">Hotspot On</string>
+    <string name="flashlight_on">Flashlight On</string>
+    <string name="flashlight_off">Flashlight Off</string>
 </resources>
