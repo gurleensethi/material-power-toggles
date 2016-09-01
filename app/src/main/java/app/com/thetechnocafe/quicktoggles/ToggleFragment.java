@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.net.wifi.WifiManager;
@@ -42,7 +41,7 @@ public class ToggleFragment extends Fragment {
     private DiscreteSeekBar mMusicSeekBar;
     private DiscreteSeekBar mAlarmSeekBar;
     private DiscreteSeekBar mVoiceCallSeekBar;
-    private ToggleButton mFlashlightToggle;
+    private ToggleButton mOrientationToggle;
 
     public static ToggleFragment getInstance() {
         return new ToggleFragment();
@@ -68,7 +67,9 @@ public class ToggleFragment extends Fragment {
         mMusicSeekBar = (DiscreteSeekBar) view.findViewById(R.id.music_volume_seekbar);
         mAlarmSeekBar = (DiscreteSeekBar) view.findViewById(R.id.alarm_volume_seekbar);
         mVoiceCallSeekBar = (DiscreteSeekBar) view.findViewById(R.id.voice_call_volume_seekbar);
-        mFlashlightToggle = (ToggleButton) view.findViewById(R.id.flashlight_toggle_button);
+        mOrientationToggle = (ToggleButton) view.findViewById(R.id.orientation_toggle_button);
+
+        requestPermissions(new String[]{Manifest.permission.WRITE_SETTINGS}, 1);
 
         return view;
     }
@@ -88,9 +89,6 @@ public class ToggleFragment extends Fragment {
 
     private void setUpBluetoothToggle() {
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (Build.VERSION.SDK_INT > 22)
-            if (getActivity().checkSelfPermission(Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED)
-                requestPermissions(new String[]{Manifest.permission.BLUETOOTH}, 1);
         mBluetoothToggle.setChecked(bluetoothAdapter.isEnabled());
         mBluetoothToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -249,13 +247,25 @@ public class ToggleFragment extends Fragment {
         });
     }
 
-    private void setUpFlashlightToggle() {
-        Camera camera = Camera.open();
-        Camera.Parameters parameters = camera.getParameters();
-        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(parameters);
-
-        camera.startPreview();
+    private void setUpOrientationToggle() {
+        int screenRotation = 0;
+        try {
+            screenRotation = Settings.System.getInt(getContext().getContentResolver(), Settings.System.ACCELEROMETER_ROTATION);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        mOrientationToggle.setChecked(screenRotation == 1);
+        mOrientationToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (Settings.System.canWrite(getContext())) {
+                    Settings.System.putInt(getContext().getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, isChecked ? 1 : 0);
+                } else {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
@@ -275,7 +285,7 @@ public class ToggleFragment extends Fragment {
         setUpMusicVolumeSeekBar();
         setUpAlarmVolumeSeekBar();
         setUpVoiceCallVolumeSeekBar();
-        //setUpFlashlightToggle();
+        setUpOrientationToggle();
     }
 
     private void createCircularAnimation(View view) {
